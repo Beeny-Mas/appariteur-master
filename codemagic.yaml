@@ -1,0 +1,27 @@
+workflows:
+  ios-workflow:
+    name: iOS Workflow
+    environment:
+      groups:
+        - Apple Credentials
+      xcode: latest
+      cocoapods: default
+      flutter: stable
+      vars:
+        XCODE_WORKSPACE: "Runner.xcworkspace"  # Remplacez par le nom de votre workspace si différent
+        XCODE_SCHEME: "Runner"  # Remplacez par le nom de votre scheme si différent
+        BUNDLE_ID: "com.h24consulting.appariteur"  # Remplacez par votre Bundle ID
+
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Flutter run
+        script: |
+          flutter run -d D3F41A76-A956-4F9B-8874-99974B22C923 
+          xcrun simctl launch <D3F41A76-A956-4F9B-8874-99974B22C923> com.h24consulting.appariteur
+
+
