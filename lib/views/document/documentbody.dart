@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:appariteur/views/document/adddDocument.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../data/apihelper.dart';
@@ -74,30 +76,54 @@ class _DocumentShildState extends State<DocumentShild> {
   }
 
   Future<void> downloadFile(String url, String fileName, BuildContext context) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final savePath = '${directory.path}/$fileName';
 
+    try {
+      if (Platform.isAndroid) {
+        await FileDownloader.downloadFile(
+          url: url,
+          name: fileName,
+          notificationType: NotificationType.all,
+          downloadDestination: DownloadDestinations.publicDownloads,
+          onDownloadCompleted: (String path) {
+            print("Fichier téléchargé à : $path");
+          },
+        );
+      } else if (Platform.isIOS) {
+        Dio dio = Dio();
+        await dio.download(url, savePath, onReceiveProgress: (received, total) {
+          if (received == total) {
+            print("Fichier téléchargé à : $savePath");
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                showCloseIcon: true,
+                duration: Duration(seconds: 8),
+                content: Text('Fichier "$fileName" téléchargé avec succès dans : $savePath.'),
+                action: SnackBarAction(
+                  label: 'Ouvrir',
+                  onPressed: () {
+                    print("Tentative d'ouverture du fichier à : $savePath");
+                    OpenFile.open(savePath).then((value) => print("Résultat de l'ouverture du fichier : ${value.message}"));
+                  },
+                ),
+              ),
+            );
 
-    final taskId = await FileDownloader.downloadFile(
-      url: url,
-      name: fileName,
-      notificationType: NotificationType.all,
-      downloadDestination: DownloadDestinations.appFiles, // Spécification du chemin de destination
-      onDownloadCompleted: (filePath) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Téléchargement terminé avec succès. Chemin du fichier: $filePath'),
-            duration: Duration(seconds: 6),
-          ),
-        );
-      },
-      onDownloadError: (errorMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erreur lors du téléchargement: $errorMessage'),
-          ),
-        );
-      },
-    );
+          }
+        });
+      }
+    } catch (e) {
+      print("Erreur lors du téléchargement du fichier : $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors du téléchargement : $e'),
+        ),
+      );
+    }
   }
+
+
 
 
   Future<void> requestPermissions() async {
