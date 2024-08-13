@@ -45,12 +45,6 @@
     <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>fetch</string>
-        <string>processing</string>
-        <string>remote-notification</string>
-    </array>
     <key>NSDocumentsFolderUsageDescription</key>
     <string>Cette application nécessite l'accès au dossier Documents pour enregistrer des fichiers PDF téléchargés.</string>
     <key>NSPhotoLibraryUsageDescription</key>
