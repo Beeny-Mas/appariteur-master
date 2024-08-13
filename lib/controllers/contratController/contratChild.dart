@@ -415,7 +415,7 @@ class ListItemContrat extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => PDFScreen(
-                  url: 'https://appariteur.com/admins/documents/${contrat.nameFichier}'),
+                  url: 'https://appariteur.com/appa/admins/documents/${contrat.nameFichier}'),
             ),
           ),
           child: Padding(
@@ -444,7 +444,7 @@ class ListItemContrat extends StatelessWidget {
                     TextButton.icon(
                       onPressed: () {
                         downloadFile(
-                            'https://appariteur.com/admins/documents/${contrat.nameFichier}',
+                            'https://appariteur.com/appa/admins/documents/${contrat.nameFichier}',
                             contrat.nameFichier,
                             context);
                       },

@@ -199,7 +199,7 @@ class _DocumentShildState extends State<DocumentShild> {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PDFScreen(url: 'https://appariteur.com/admins/documents/${doc.docName}'),
+                            builder: (context) => PDFScreen(url: 'https://appariteur.com/appa/admins/documents/${doc.docName}'),
                           ),
                         ),
                         child: Padding(
@@ -221,7 +221,7 @@ class _DocumentShildState extends State<DocumentShild> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   TextButton.icon(
-                                    onPressed: () => downloadFile('https://appariteur.com/admins/documents/${doc.docName}', '${doc.docName}.pdf', context),
+                                    onPressed: () => downloadFile('https://appariteur.com/appa/admins/documents/${doc.docName}', '${doc.docName}.pdf', context),
                                     icon: Icon(Icons.download, color: Theme.of(context).primaryColor),
                                     label: Text('Télécharger', style: Theme.of(context).textTheme.bodyMedium),
                                   ),
@@ -229,7 +229,7 @@ class _DocumentShildState extends State<DocumentShild> {
                                     onPressed: () => Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => PDFScreen(url: 'https://appariteur.com/admins/documents/${doc.docName}'),
+                                        builder: (context) => PDFScreen(url: 'https://appariteur.com/appa/admins/documents/${doc.docName}'),
                                       ),
                                     ),
                                     icon: Icon(Icons.remove_red_eye, color: Theme.of(context).primaryColor),

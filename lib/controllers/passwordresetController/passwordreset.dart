@@ -132,7 +132,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   ? Center(child: CircularProgressIndicator())
                                   : AppButton(
                                 text: "Réinitialiser le mot de passe",
-                                color: Theme.of(context).primaryColor,
+                                color: Colors.blue,
                                 textColor: Colors.white,
                                 shapeBorder: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
