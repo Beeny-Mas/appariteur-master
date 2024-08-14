@@ -101,9 +101,11 @@ flutter:
     - assets/images/
     - assets/icons/
 flutter_launcher_icons:
-  android: true
+  android: false
   ios: true
   image_path: "assets/images/logo.png"
+  remove_alpha_ios: true
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
