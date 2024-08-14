@@ -87,24 +87,45 @@ class _DocumentShildState extends State<DocumentShild> {
           notificationType: NotificationType.all,
           downloadDestination: DownloadDestinations.publicDownloads,
           onDownloadCompleted: (String path) {
-            print("Fichier téléchargé à : $path");
+            print("File downloaded to: $path");
           },
         );
       } else if (Platform.isIOS) {
         Dio dio = Dio();
+
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: Row(
+                children: [
+                  CircularProgressIndicator(color: Colors.blue,),
+                  SizedBox(width: 20),
+                  Expanded(child: Text("Téléchargement en cours...")),
+                ],
+              ),
+            );
+          },
+        );
+
         await dio.download(url, savePath, onReceiveProgress: (received, total) {
           if (received == total) {
-            print("Fichier téléchargé à : $savePath");
+            print("File downloaded to: $savePath");
+
+            Navigator.pop(context);
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 showCloseIcon: true,
-                duration: Duration(seconds: 8),
+                duration: Duration(seconds: 10),
                 content: Text('Fichier "$fileName" téléchargé avec succès dans : $savePath.'),
                 action: SnackBarAction(
                   label: 'Ouvrir',
                   onPressed: () {
-                    print("Tentative d'ouverture du fichier à : $savePath");
-                    OpenFile.open(savePath).then((value) => print("Résultat de l'ouverture du fichier : ${value.message}"));
+                    print("Attempting to open file at: $savePath");
+                    OpenFile.open(savePath).then((value) => print("OpenFile result: ${value.message}"));
                   },
                 ),
               ),
@@ -114,10 +135,15 @@ class _DocumentShildState extends State<DocumentShild> {
         });
       }
     } catch (e) {
-      print("Erreur lors du téléchargement du fichier : $e");
+
+      if (Platform.isIOS) {
+        Navigator.pop(context);
+      }
+
+      print("Error during file download: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erreur lors du téléchargement : $e'),
+          content: Text('Erreur lors du téléchargement: $e'),
         ),
       );
     }
