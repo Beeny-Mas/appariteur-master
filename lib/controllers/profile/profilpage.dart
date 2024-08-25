@@ -1,7 +1,9 @@
+import 'package:appariteur/controllers/loginController/childlogin.dart';
 import 'package:appariteur/controllers/profile/profileimg.dart';
 import 'package:appariteur/controllers/profile/profileimgedit.dart';
 import 'package:appariteur/views/widgets/addonglobal/topbar.dart';
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/user.dart';
 import '../../data/apihelper.dart';
@@ -74,20 +76,42 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Confirmation"),
-          content: Text("Voulez-vous vraiment demander la suppression de votre compte ? Si oui, vous serez redirigé vers notre site. Vous vous rendrez à la dernière section."),
+          title: Text("ATTENTION", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.red, size: 50),
+              SizedBox(height: 20),
+              Text(
+                "Vous êtes sur le point de supprimer votre compte.",
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 10),
+              Text(
+                "Cette action est IRRÉVERSIBLE !",
+                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              Text(
+                "Êtes-vous absolument sûr de vouloir continuer ?",
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
           actions: <Widget>[
             TextButton(
-              child: Text("Non"),
+              child: Text("Annuler", style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text("Oui"),
+              child: Text("Oui, supprimer mon compte", style: TextStyle(color: Colors.red)),
               onPressed: () {
-                Navigator.of(context).pop();  // Close the dialog
-                _launchURL();  // Redirect to the website
+                Navigator.of(context).pop();
+                _confirmAccountDeactivation();
               },
             ),
           ],
@@ -96,18 +120,95 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _launchURL() async {
-    const url = 'https://appariteur.com/appa/mention.php';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Impossible d\'ouvrir l\'URL'),
-        ),
-      );
-    }
+  void _confirmAccountDeactivation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("DERNIÈRE CHANCE", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.error_outline, color: Colors.red, size: 50),
+              SizedBox(height: 20),
+              Text(
+                "Êtes-vous vraiment sûr de vouloir supprimer votre compte ?",
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 10),
+              Text(
+                "Cette action ne peut pas être annulée !",
+                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Non, annuler', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Oui, je suis sûr', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              onPressed: () async {
+                Navigator.of(context).pop(); // Ferme le dialogue
+
+                // Vérifier la connexion internet
+                var connectivityResult = await (Connectivity().checkConnectivity());
+                if (connectivityResult == ConnectivityResult.none) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Pas de connexion internet. Veuillez réessayer plus tard.')),
+                  );
+                  return;
+                }
+
+
+                _showDeletionSuccessDialog();
+
+                bool success = await AuthApi.deleteAccount();
+                if (success) {
+                  await AuthApi.logout();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Échec de la suppression du compte')),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
+
+  void _showDeletionSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        Future.delayed(Duration(seconds: 3), () {
+          Navigator.of(context).pop(true); // Ferme le dialogue après 2 secondes
+          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => SignInScreen()),
+                (Route<dynamic> route) => false,
+          );
+        });
+        return AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Expanded(child: Text("Compte supprimé, redirection en cours...")),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +255,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         controller: nameController,
                         decoration: const InputDecoration(
                           labelText: "Nom",
-
                         ),
                         readOnly: !isEditing,
                       ),

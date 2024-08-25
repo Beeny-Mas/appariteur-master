@@ -63,7 +63,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-    // Vérification du format du numéro de téléphone
+
     final phonePattern = RegExp(r'^\+33[0-9]{9}$');
     if (phoneController.text.isNotEmpty && !phonePattern.hasMatch(phoneController.text)) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -41,8 +41,6 @@ class AuthApi {
           final userData = data['data'];
           tokenVar = data['token'];
           SharedPreferences prefs = await SharedPreferences.getInstance();
-
-          // Enregistrer le token, userId et appariteurId en vérifiant leur non-nullité
           if (tokenVar != null) {
             prefs.setString('token', tokenVar!);
           }
@@ -60,7 +58,6 @@ class AuthApi {
             }
           });
 
-          // Création de l'objet UserData avec des vérifications pour les champs nullables
           return UserData(
             userId: userData['user_id'],
             appariteurId: userData['appariteur_id'],
@@ -88,7 +85,41 @@ class AuthApi {
     return null;
   }
 
+  static Future<bool> deleteAccount() async {
+    final token = await getToken();
+    if (token == null) {
+      print('Error: Token is null');
+      return false;
+    }
 
+    const url = 'https://appariteur.com/api/users/deleteuser.php';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['success'] == true) {
+          print('Account deactivated successfully');
+          return true;
+        } else {
+          print('Failed to deactivate account: ${responseData['message']}');
+        }
+      } else {
+        print('Failed to deactivate account. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error deactivating account: $e');
+    }
+
+    return false;
+  }
 
   static Future<UserData?> getLocalUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -65,6 +65,9 @@ dependencies:
   flutter_local_notifications: ^17.2.2
   open_file: ^3.3.2
   firebase_core: ^3.3.0
+  riverpod: ^2.5.1
+  flutter_riverpod: ^2.5.1
+
   # path
   file_picker: ^8.0.6
   path_provider: ^2.1.1
@@ -76,7 +79,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
-
+  golden_toolkit: ^0.15.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

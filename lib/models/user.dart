@@ -13,6 +13,7 @@
     final String? codepostal;
     final String? ville;
     final String? pays;
+    final String? Statut;
     final String? niveau;
     final String? user;
     final String? password;
@@ -32,6 +33,7 @@
       this.rue,
       this.codepostal,
       this.ville,
+      this.Statut,
       this.pays,
       this.niveau,
       this.user,
@@ -75,6 +77,7 @@
           'rue': rue,
           'codepostal': codepostal,
           'ville': ville,
+          'Statut':Statut,
           'pays': pays,
           'niveau': niveau,
           'user': user,
