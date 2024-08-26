@@ -177,7 +177,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void initState() {
     super.initState();
     countryFocusNode.unfocus();
-    phoneController.text = "+33";
+    phoneController.text = "";
     phoneController.addListener(() {
       if (phoneController.text.length > 12) {
         phoneController.text = phoneController.text.substring(0, 12);
