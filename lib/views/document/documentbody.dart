@@ -120,7 +120,7 @@ class _DocumentShildState extends State<DocumentShild> {
               SnackBar(
                 showCloseIcon: true,
                 duration: Duration(seconds: 10),
-                content: Text('Fichier "$fileName" téléchargé avec succès dans : $savePath.'),
+                content: Text('Fichier "$fileName" téléchargé avec succès.'),
                 action: SnackBarAction(
                   label: 'Ouvrir',
                   onPressed: () {

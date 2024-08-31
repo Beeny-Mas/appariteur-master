@@ -92,7 +92,7 @@ class _SignInScreenState extends State<SignInScreen> {
             Text("Se connecter", style: boldTextStyle(size: 24, color: black)),
             SingleChildScrollView(
               child: Container(
-                width: 400, // Largeur fixe pour le contenu scrollable
+                width: 400,
                 child: Column(
                   children: <Widget>[
                     Stack(
@@ -108,13 +108,13 @@ class _SignInScreenState extends State<SignInScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              SizedBox(height: 80), // Pour l'espacement sous le logo
+                              SizedBox(height: 80),
                               AppTextField(
                                 decoration: coInputDecoration(
-                                  hint: 'Entrer votre email',
-                                  context: context,
-                                  prefixIcon: Icons.email_outlined,
-                                  borderColor: Colors.blue
+                                    hint: 'Entrer votre email',
+                                    context: context,
+                                    prefixIcon: Icons.email_outlined,
+                                    borderColor: Colors.blue
                                 ),
                                 textFieldType: TextFieldType.EMAIL,
                                 keyboardType: TextInputType.emailAddress,
@@ -142,8 +142,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               5.height,
                               Align(
                                 alignment: Alignment.centerRight,
-                                child:
-                                TextButton(
+                                child: TextButton(
                                   onPressed: () {
                                     Navigator.push(
                                       context,
@@ -178,30 +177,28 @@ class _SignInScreenState extends State<SignInScreen> {
                                 right: _w * 0.1,
                               ),
                               30.height,
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment:
-                                CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text('Vous n\'avez pas de compte?',
-                                      style: primaryTextStyle(
-                                          color: Colors.grey)),
-                                  3.width,
-                                  Flexible(
-                                    child: Text('Inscrivez-vous ici',
-                                        textAlign: TextAlign.center,
-                                        style: boldTextStyle(color: black)),
-                                  ),
-                                ],
-                              ).onTap(() {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SignUpScreen()
-                                  ),
-                                );
-                              }).center(),
+                              Center(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Vous n\'avez pas de compte?',
+                                      style: primaryTextStyle(color: Colors.grey),
+                                    ),
+                                    8.height,
+                                    Text(
+                                      'Inscrivez-vous ici',
+                                      style: boldTextStyle(color: Colors.black),
+                                    ).onTap(() {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SignUpScreen(),
+                                        ),
+                                      );
+                                    }),
+                                  ],
+                                ),
+                              ),
                               20.height,
                             ],
                           ),
@@ -224,23 +221,22 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
               ),
             ),
+            Spacer(),
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: EdgeInsets.only(bottom: 16), // Réduit le padding bottom
+                padding: EdgeInsets.only(bottom: 16),
                 child: TextButton(
                   onPressed: _launchURL,
                   child: Text(
-                    "Découvrir Appariteur",
-                    style: GoogleFonts.merienda(
-                      fontSize: _w * 0.05,
-                      color: Colors.white,
-                      decoration: TextDecoration.underline,
+                    "En savoir plus",
+                    style: boldTextStyle(
+                      color: Colors.black,
                     ),
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
