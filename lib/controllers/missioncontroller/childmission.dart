@@ -278,6 +278,20 @@ return _nom;
                   2: pw.Alignment.centerLeft,
                   3: pw.Alignment.centerRight,
                 },
+                // Ajustements pour empêcher le débordement
+                cellPadding: pw.EdgeInsets.all(4),
+                columnWidths: {
+                  0: pw.FixedColumnWidth(80), // Largeur fixe pour la colonne Date
+                  1: pw.FixedColumnWidth(100), // Largeur fixe pour la colonne Etablissement
+                  2: pw.FixedColumnWidth(60),  // Largeur fixe pour la colonne Duree
+                  3: pw.FixedColumnWidth(70),  // Largeur fixe pour la colonne Heure début
+                  4: pw.FixedColumnWidth(70),  // Largeur fixe pour la colonne Heure fin
+                },
+                cellStyle: pw.TextStyle(
+                  font: font,
+                  fontFallback: [fontFallback],
+                  fontSize: 10, // Réduire la taille de la police si nécessaire
+                ),
               ),
               pw.SizedBox(height: 16),
               if (_totalHours != null && _totalHours!.isNotEmpty)
