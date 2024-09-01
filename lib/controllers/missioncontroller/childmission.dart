@@ -6,10 +6,10 @@ import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-
+import 'package:google_fonts/google_fonts.dart';
 import '../../data/apihelper.dart';
 import '../../models/missionuser.dart';
-
+import 'package:pdf/pdf.dart';
 class BodyM extends StatefulWidget {
   @override
   _BodyMState createState() => _BodyMState();
@@ -168,9 +168,56 @@ class _BodyMState extends State<BodyM> {
       showToast("Choisissez une date de début et une date de fin.");
     }
   }
+  String sanitizeText(String input) {
+    Map<String, String> replacements = {
+      'é': 'e',
+      'è': 'e',
+      'ê': 'e',
+      'ë': 'e',
+      'à': 'a',
+      'â': 'a',
+      'ä': 'a',
+      'ç': 'c',
+      'î': 'i',
+      'ï': 'i',
+      'ù': 'u',
+      'û': 'u',
+      'ü': 'u',
+      'ô': 'o',
+      'ö': 'o',
+
+      // Ajoutez d'autres remplacements si nécessaire
+    };
+
+    String output = input;
+    replacements.forEach((key, value) {
+      output = output.replaceAll(key, value);
+    });
+    output = output.replaceAll(RegExp(r'[^\x00-\x7F]'), ' ');
+
+    return output;
+
+
+  }
+  Future<String?> returnName() async {
+    final user = await AuthApi.getLocalUserData();
+    String? _nom= '';
+    if (user != null) {
+_nom=user.name;
+return _nom;
+    }
+  }
 
   Future<void> _generatePdf() async {
     final pdf = pw.Document();
+
+    String? nom = await returnName();
+    if (nom == null) {
+      nom = "Nom non trouve";
+    }
+
+    final font = pw.Font.helvetica();
+    final fontFallback = pw.Font.courier();
 
     pdf.addPage(
       pw.Page(
@@ -179,27 +226,71 @@ class _BodyMState extends State<BodyM> {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text(
-                'Liste des Missions',
-                style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-              ),
-              pw.SizedBox(height: 16),
-              ..._missions!.map(
-                    (mission) => pw.Container(
-                  margin: const pw.EdgeInsets.only(bottom: 8),
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text(
-                        mission.etabli,
-                        style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
-                      ),
-                      pw.Text('Date: ${DateFormat('dd/MM/yyyy').format(mission.date)}'),
-                      pw.Text('Moment: ${mission.moment}'),
-                      pw.Text('Durée: ${mission.duree.substring(0, 5)}'),
-                    ],
-                  ),
+                sanitizeText(nom!),
+                style: pw.TextStyle(
+                  font: font,
+                  fontFallback: [fontFallback],
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.blueAccent100,
                 ),
               ),
+              pw.SizedBox(height: 16),
+              pw.Text(
+                sanitizeText('Liste des Missions'),
+                style: pw.TextStyle(
+                  font: font,
+                  fontFallback: [fontFallback],
+                  fontSize: 24,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 16),
+              pw.Table.fromTextArray(
+                headers: [
+                  'Date',
+                  'Etablissement',
+                  'Duree effective',
+                  'Heure debut',
+                  'Heure fin'
+                ].map((header) => sanitizeText(header)).toList(),
+                data: _missions!.map((mission) {
+                  return [
+                    sanitizeText(DateFormat('dd/MM/yyyy').format(mission.date)),
+                    sanitizeText(mission.etabli ?? 'Inconnu'),
+                    sanitizeText(mission.duree?.substring(0, 5) ?? 'Inconnu'),
+                    sanitizeText(mission.heureDebut ?? 'Inconnu'),
+                    sanitizeText(mission.heureFin ?? 'Inconnu'),
+                  ];
+                }).toList(),
+                border: pw.TableBorder.all(),
+                cellAlignment: pw.Alignment.centerLeft,
+                headerStyle: pw.TextStyle(
+                  font: font,
+                  fontFallback: [fontFallback],
+                  fontWeight: pw.FontWeight.bold,
+                ),
+                headerDecoration: pw.BoxDecoration(color: PdfColors.grey300),
+                cellHeight: 30,
+                cellAlignments: {
+                  0: pw.Alignment.centerLeft,
+                  1: pw.Alignment.centerLeft,
+                  2: pw.Alignment.centerLeft,
+                  3: pw.Alignment.centerRight,
+                },
+              ),
+              pw.SizedBox(height: 16),
+              if (_totalHours != null && _totalHours!.isNotEmpty)
+                pw.Text(
+                  sanitizeText('Heures Totales: ${formatTotalHours(_totalHours!)}'),
+                  style: pw.TextStyle(
+                    font: font,
+                    fontFallback: [fontFallback],
+                    fontSize: 18,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.teal,
+                  ),
+                ),
             ],
           );
         },

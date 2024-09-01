@@ -121,7 +121,7 @@ class AuthApi {
     return false;
   }
 
-  static Future<UserData?> getLocalUserData() async {
+  static Future<UserData?>  getLocalUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
     if (userId == null) return null; // Si l'utilisateur n'est pas connecté

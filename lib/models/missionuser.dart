@@ -34,20 +34,41 @@ class MissionEffUserResult {
 
   MissionEffUserResult({this.missions, this.totalHours});
 }
+
 class Mission {
   DateTime date;
   String etabli;
   String duree;
   String moment;
+  String numCmd;
+  String? dureeEffective;
+  String heureDebut;
+  String heureFin;
+  String lieu;
 
-  Mission({required this.date, required this.etabli, required this.duree,required this.moment});
+  Mission({
+    required this.date,
+    required this.etabli,
+    required this.duree,
+    required this.moment,
+    required this.numCmd,
+    this.dureeEffective,
+    required this.heureDebut,
+    required this.heureFin,
+    required this.lieu
+  });
 
   factory Mission.fromJson(Map<String, dynamic> json) {
     return Mission(
       date: DateTime.parse(json['date']),
       etabli: json['etabli'],
       duree: json['duree'],
-      moment: json['moment']
+      moment: json['moment'],
+      numCmd: json['num_cmd'],
+      dureeEffective: json['duree_effective'],
+      heureDebut: json['heure_debut'],
+      heureFin: json['heure_fin'],
+      lieu:json['lieu']
     );
   }
 }
