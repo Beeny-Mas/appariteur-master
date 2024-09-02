@@ -264,7 +264,7 @@ return _nom;
               pw.Table.fromTextArray(
                 headers: [
                   'Date',
-                  'Établissement',
+                  'Etablissement',
                   'Durée effective',
                   'Heure début',
                   'Heure fin'
