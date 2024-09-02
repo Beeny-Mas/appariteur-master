@@ -15,7 +15,7 @@ void main() async {
   await FlutterDownloader.initialize();
   const AndroidInitializationSettings initializationSettingsAndroid=AndroidInitializationSettings('@mipmap/ic_launcher');
   //const DarwinInitializationSettings initializationSettingsiOs = DarwinInitializationSettings();
-  final InitializationSettings initializationSettings = InitializationSettings(android:initializationSettingsAndroid, iOS:initializationSettingsiOs);
+  final InitializationSettings initializationSettings = InitializationSettings(android:initializationSettingsAndroid);
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
