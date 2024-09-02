@@ -17,10 +17,10 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.2</string>
+    <string>$(FLUTTER_BUILD_NAME)</string>
     <key>CFBundleSignature</key>
     <string>????</string>
-    <key>CFBundleVersion</key>CFBundleShortVersionString
+    <key>CFBundleVersion</key>
     <string>7</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
