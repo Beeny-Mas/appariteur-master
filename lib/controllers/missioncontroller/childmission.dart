@@ -213,45 +213,60 @@ return _nom;
 
     String? nom = await returnName();
     if (nom == null) {
-      nom = "Nom non trouve";
+      nom = "Nom non trouvé";
     }
 
-    final font = pw.Font.helvetica();
-    final fontFallback = pw.Font.courier();
+    final font = await PdfGoogleFonts.openSansRegular();
+    final fontBold = await PdfGoogleFonts.openSansBold();
+    final fontItalic = await PdfGoogleFonts.openSansItalic();
+
+    // Formatage des dates sélectionnées
+    String formattedStartDate = DateFormat('dd/MM/yyyy').format(_startDate!);
+    String formattedEndDate = DateFormat('dd/MM/yyyy').format(_endDate!);
 
     pdf.addPage(
       pw.Page(
+        pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
+              pw.Header(
+                level: 0,
+                margin: pw.EdgeInsets.only(bottom: 20),
+                child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(sanitizeText('Rapport de Missions'), style: pw.TextStyle(font: fontBold, fontSize: 24)),
+                    pw.Text(sanitizeText(DateFormat('dd/MM/yyyy').format(DateTime.now())), style: pw.TextStyle(font: font, fontSize: 12)),
+                  ],
+                ),
+              ),
               pw.Text(
                 sanitizeText(nom!),
                 style: pw.TextStyle(
-                  font: font,
-                  fontFallback: [fontFallback],
+                  font: fontBold,
                   fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.blueAccent100,
+                  color: PdfColors.teal,
                 ),
               ),
-              pw.SizedBox(height: 16),
+              pw.SizedBox(height: 10),
               pw.Text(
-                sanitizeText('Liste des Missions'),
+                sanitizeText('Liste des Missions entre le $formattedStartDate et le $formattedEndDate'),
                 style: pw.TextStyle(
-                  font: font,
-                  fontFallback: [fontFallback],
-                  fontSize: 24,
-                  fontWeight: pw.FontWeight.bold,
+                  font: fontBold,
+                  fontSize: 16,
                 ),
               ),
-              pw.SizedBox(height: 16),
+              pw.SizedBox(height: 10),
+              pw.Divider(),
+              pw.SizedBox(height: 10),
               pw.Table.fromTextArray(
                 headers: [
                   'Date',
-                  'Etablissement',
-                  'Duree effective',
-                  'Heure debut',
+                  'Établissement',
+                  'Durée effective',
+                  'Heure début',
                   'Heure fin'
                 ].map((header) => sanitizeText(header)).toList(),
                 data: _missions!.map((mission) {
@@ -263,48 +278,41 @@ return _nom;
                     sanitizeText(mission.heureFin ?? 'Inconnu'),
                   ];
                 }).toList(),
-                border: pw.TableBorder.all(),
+                border: pw.TableBorder.all(color: PdfColors.grey, width: 0.5),
                 cellAlignment: pw.Alignment.centerLeft,
                 headerStyle: pw.TextStyle(
-                  font: font,
-                  fontFallback: [fontFallback],
-                  fontWeight: pw.FontWeight.bold,
+                  font: fontBold,
+                  fontSize: 12,
+                  color: PdfColors.white,
                 ),
-                headerDecoration: pw.BoxDecoration(color: PdfColors.grey300),
-                cellHeight: 30,
-                cellAlignments: {
-                  0: pw.Alignment.centerLeft,
-                  1: pw.Alignment.centerLeft,
-                  2: pw.Alignment.centerLeft,
-                  3: pw.Alignment.centerRight,
-                },
-                // Ajustements pour empêcher le débordement
-                cellPadding: pw.EdgeInsets.all(4),
-                columnWidths: {
-                  0: pw.FixedColumnWidth(80), // Largeur fixe pour la colonne Date
-                  1: pw.FixedColumnWidth(100), // Largeur fixe pour la colonne Etablissement
-                  2: pw.FixedColumnWidth(60),  // Largeur fixe pour la colonne Duree
-                  3: pw.FixedColumnWidth(70),  // Largeur fixe pour la colonne Heure début
-                  4: pw.FixedColumnWidth(70),  // Largeur fixe pour la colonne Heure fin
-                },
+                headerDecoration: pw.BoxDecoration(color: PdfColors.blue),
                 cellStyle: pw.TextStyle(
                   font: font,
-                  fontFallback: [fontFallback],
-                  fontSize: 10, // Réduire la taille de la police si nécessaire
+                  fontSize: 10,
                 ),
+                cellPadding: pw.EdgeInsets.all(4),
+                columnWidths: {
+                  0: pw.FixedColumnWidth(80),
+                  1: pw.FixedColumnWidth(100),
+                  2: pw.FixedColumnWidth(60),
+                  3: pw.FixedColumnWidth(70),
+                  4: pw.FixedColumnWidth(70),
+                },
               ),
               pw.SizedBox(height: 16),
               if (_totalHours != null && _totalHours!.isNotEmpty)
                 pw.Text(
                   sanitizeText('Heures Totales: ${formatTotalHours(_totalHours!)}'),
                   style: pw.TextStyle(
-                    font: font,
-                    fontFallback: [fontFallback],
-                    fontSize: 18,
-                    fontWeight: pw.FontWeight.bold,
+                    font: fontBold,
+                    fontSize: 14,
                     color: PdfColors.teal,
                   ),
                 ),
+              pw.Spacer(),
+              pw.Footer(
+                title: pw.Text('Généré par MonApp', style: pw.TextStyle(font: fontItalic, fontSize: 10)),
+              ),
             ],
           );
         },
@@ -322,7 +330,6 @@ return _nom;
       showToast('PDF généré et disponible dans les fichiers de l\'application.');
     }
   }
-
   @override
   Widget build(BuildContext context) {
     double _w = MediaQuery.of(context).size.width;

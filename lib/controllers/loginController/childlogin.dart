@@ -89,7 +89,13 @@ class _SignInScreenState extends State<SignInScreen> {
         child: Column(
           children: <Widget>[
             SizedBox(height: 100),
-            Text("Se connecter", style: boldTextStyle(size: 24, color: black)),
+          Text(
+            "Se connecter",
+            style: GoogleFonts.montserrat(
+              textStyle: boldTextStyle(size: 26, color: Colors.white),
+            ),
+          ),
+          SizedBox(height: 25),
             SingleChildScrollView(
               child: Container(
                 width: 400,
@@ -186,8 +192,10 @@ class _SignInScreenState extends State<SignInScreen> {
                                     ),
                                     8.height,
                                     Text(
-                                      'Inscrivez-vous ici',
-                                      style: boldTextStyle(color: Colors.black),
+                                        'Inscrivez-vous ici',
+                                        style: GoogleFonts.montserrat(
+                                          textStyle: boldTextStyle(color: Colors.blue.shade600),
+                                        ),
                                     ).onTap(() {
                                       Navigator.push(
                                         context,
@@ -230,8 +238,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   onPressed: _launchURL,
                   child: Text(
                     "En savoir plus",
-                    style: boldTextStyle(
-                      color: Colors.black,
+                    style: GoogleFonts.montserrat(
+                      textStyle: boldTextStyle(
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),

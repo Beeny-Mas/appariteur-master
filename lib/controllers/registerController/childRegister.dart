@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:appariteur/util/dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import '../../models/user.dart';
 import '../../views/notif/notifScreen.dart';
@@ -205,7 +206,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             children: <Widget>[
               SizedBox(height: 100),
-              Text("S'inscrire", style: boldTextStyle(size: 24, color: black)),
+              Text(
+                "S'inscrire",
+                style: GoogleFonts.montserrat(
+                  textStyle: boldTextStyle(size: 24, color: Colors.white),
+                ),
+              ),
+              SizedBox(height: 25),
               SingleChildScrollView(
                 child: Container(
                   width: 1200, // Largeur fixe pour le contenu scrollable
