@@ -310,9 +310,7 @@ return _nom;
                   ),
                 ),
               pw.Spacer(),
-              pw.Footer(
-                title: pw.Text('Généré par MonApp', style: pw.TextStyle(font: fontItalic, fontSize: 10)),
-              ),
+
             ],
           );
         },
