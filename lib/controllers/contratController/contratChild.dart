@@ -144,7 +144,6 @@ class ListItem extends StatelessWidget {
                 ),
               ),
             );
-            _showDownloadNotification(fileName, savePath);
           }
         });
       }
@@ -158,26 +157,7 @@ class ListItem extends StatelessWidget {
     }
   }
 
-  Future<void> _showDownloadNotification(
-      String fileName, String filePath) async {
-    const DarwinNotificationDetails iosPlatformChannelSpecifics =
-    DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
 
-    const NotificationDetails platformChannelSpecifics =
-    NotificationDetails(iOS: iosPlatformChannelSpecifics);
-
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      'Téléchargement terminé',
-      'Fichier "$fileName" téléchargé avec succès. Ouvrir ?',
-      platformChannelSpecifics,
-      payload: filePath,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

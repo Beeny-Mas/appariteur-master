@@ -14,8 +14,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize();
   const AndroidInitializationSettings initializationSettingsAndroid=AndroidInitializationSettings('@mipmap/ic_launcher');
-  //const DarwinInitializationSettings initializationSettingsiOs = DarwinInitializationSettings();
-  final InitializationSettings initializationSettings = InitializationSettings(android:initializationSettingsAndroid);
+  const DarwinInitializationSettings initializationSettingsiOs = DarwinInitializationSettings();
+  final InitializationSettings initializationSettings = InitializationSettings(android:initializationSettingsAndroid, iOS:initializationSettingsiOs);
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
