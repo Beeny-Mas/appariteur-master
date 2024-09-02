@@ -265,17 +265,17 @@ return _nom;
                 headers: [
                   'Date',
                   'Etablissement',
-                  'Durée effective',
                   'Heure début',
-                  'Heure fin'
+                  'Heure fin',
+                  'Durée'
                 ].map((header) => sanitizeText(header)).toList(),
                 data: _missions!.map((mission) {
                   return [
                     sanitizeText(DateFormat('dd/MM/yyyy').format(mission.date)),
                     sanitizeText(mission.etabli ?? 'Inconnu'),
-                    sanitizeText(mission.duree?.substring(0, 5) ?? 'Inconnu'),
                     sanitizeText(mission.heureDebut ?? 'Inconnu'),
                     sanitizeText(mission.heureFin ?? 'Inconnu'),
+                    sanitizeText(mission.duree?.substring(0, 5) ?? 'Inconnu'),
                   ];
                 }).toList(),
                 border: pw.TableBorder.all(color: PdfColors.grey, width: 0.5),
@@ -298,11 +298,18 @@ return _nom;
                   3: pw.FixedColumnWidth(70),
                   4: pw.FixedColumnWidth(70),
                 },
+                cellAlignments: {
+                  0:pw.Alignment.center,
+                  1:pw.Alignment.center,
+                  2:pw.Alignment.center,
+                  3:pw.Alignment.center,
+                  4: pw.Alignment.center,
+                },
               ),
               pw.SizedBox(height: 16),
               if (_totalHours != null && _totalHours!.isNotEmpty)
                 pw.Text(
-                  sanitizeText('Heures Totales: ${formatTotalHours(_totalHours!)}'),
+                  sanitizeText('Total des heures: ${formatTotalHours(_totalHours!)}'),
                   style: pw.TextStyle(
                     font: fontBold,
                     fontSize: 14,
