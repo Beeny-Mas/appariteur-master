@@ -22,6 +22,7 @@ class _BodyMState extends State<BodyM> {
   DateTime? _endDate = DateTime.now();
   List<Mission>? _missions = [];
   String? _totalHours = '';
+  bool _isLoading  = false;
 
   Widget _buildDateButton(BuildContext context, bool isStart, String label, DateTime? date) {
     double _w = MediaQuery.of(context).size.width;
@@ -49,7 +50,6 @@ class _BodyMState extends State<BodyM> {
       child: Text(label, style: TextStyle(color: Colors.white)),
     );
   }
-
   String formatTotalHours(String totalHours) {
     List<String> parts = totalHours.split(':');
     String hours = parts[0].padLeft(2, '0');
@@ -209,6 +209,10 @@ return _nom;
   }
 
   Future<void> _generatePdf() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     final pdf = pw.Document();
 
     String? nom = await returnName();
@@ -218,9 +222,7 @@ return _nom;
 
     final font = await PdfGoogleFonts.openSansRegular();
     final fontBold = await PdfGoogleFonts.openSansBold();
-    final fontItalic = await PdfGoogleFonts.openSansItalic();
 
-    // Formatage des dates sélectionnées
     String formattedStartDate = DateFormat('dd/MM/yyyy').format(_startDate!);
     String formattedEndDate = DateFormat('dd/MM/yyyy').format(_endDate!);
 
@@ -299,10 +301,10 @@ return _nom;
                   4: pw.FixedColumnWidth(70),
                 },
                 cellAlignments: {
-                  0:pw.Alignment.center,
-                  1:pw.Alignment.center,
-                  2:pw.Alignment.center,
-                  3:pw.Alignment.center,
+                  0: pw.Alignment.center,
+                  1: pw.Alignment.center,
+                  2: pw.Alignment.center,
+                  3: pw.Alignment.center,
                   4: pw.Alignment.center,
                 },
               ),
@@ -317,7 +319,6 @@ return _nom;
                   ),
                 ),
               pw.Spacer(),
-
             ],
           );
         },
@@ -330,10 +331,14 @@ return _nom;
 
     if (Theme.of(context).platform == TargetPlatform.android ||
         Theme.of(context).platform == TargetPlatform.iOS) {
-      Printing.layoutPdf(onLayout: (PdfPageFormat format) async => file.readAsBytesSync());
+      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => file.readAsBytesSync());
     } else {
       showToast('PDF généré et disponible dans les fichiers de l\'application.');
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -356,10 +361,17 @@ return _nom;
             _buildActionButton(context, _fetchMissions, 'Chercher les missions', Colors.green),
             if (_hasSearched && _missions!.isNotEmpty) ...[
               SizedBox(height: _w / 30),
-              _buildActionButton(context, _generatePdf, 'Télécharger en PDF', Colors.blue),
+              _isLoading
+                  ? Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+                ),
+              )
+                  : _buildActionButton(context, _generatePdf, 'Télécharger en PDF', Colors.blue),
             ],
             SizedBox(height: _w / 30),
             _buildTotalHoursDisplay(),
+            SizedBox(height: _w / 30),
             _buildMissionsList(),
           ],
         ),
