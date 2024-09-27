@@ -64,9 +64,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
+    // Validation du numéro de téléphone
+    String phone = phoneController.text;
+
+    // Si le numéro commence par "0", on le transforme en "+33"
+    if (phone.startsWith('0')) {
+      phone = '+33${phone.substring(1)}';
+    }
 
     final phonePattern = RegExp(r'^\+33[0-9]{9}$');
-    if (phoneController.text.isNotEmpty && !phonePattern.hasMatch(phoneController.text)) {
+
+    if (!phonePattern.hasMatch(phone)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Numéro de téléphone invalide'),
@@ -78,7 +86,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       });
       return;
     }
-
 
     // Vérification de la correspondance des mots de passe
     if (passwordController.text != confirmPasswordController.text) {
@@ -113,7 +120,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     String gender = selectedGender.isNotEmpty ? selectedGender : "";
     String birthdate = birthdateController.text.isNotEmpty ? birthdateController.text : "";
     String fullAddress = streetController.text.isNotEmpty ? "${streetController.text}, ${cityController.text}, ${countryController.text}" : "";
-
+    var userData = UserData(
+      name: nameController.text,
+      email: emailController.text,
+      tel: phoneController.text,
+      sexe: gender,
+      password: passwordController.text,
+      datenais: birthdate,
+      lieunais: birthplaceController.text,
+      rue: fullAddress,
+      pays: countryController.text.isNotEmpty ? countryController.text : "",
+    ).toApiJson();
+    print("Données envoyées : ${jsonEncode(userData)}");
     try {
       final response = await http.post(
         Uri.parse('https://appariteur.com/api/users/register.php'),
@@ -123,7 +141,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         body: jsonEncode(UserData(
           name: nameController.text,
           email: emailController.text,
-          tel: phoneController.text,
+          tel: phone,  // Utilisation du numéro de téléphone modifié
           sexe: gender,
           password: passwordController.text,
           datenais: birthdate,
@@ -131,9 +149,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
           rue: fullAddress,
           pays: countryController.text.isNotEmpty ? countryController.text : "",
         ).toApiJson()),
+
       );
 
       if (response.statusCode == 201) {
+        // Succès de l'inscription
         print("Succès");
         showDialog(
           context: context,
@@ -173,6 +193,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       });
     }
   }
+
 
   @override
   void initState() {

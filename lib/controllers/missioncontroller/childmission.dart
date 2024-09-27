@@ -227,100 +227,96 @@ return _nom;
     String formattedEndDate = DateFormat('dd/MM/yyyy').format(_endDate!);
 
     pdf.addPage(
-      pw.Page(
+      pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Header(
-                level: 0,
-                margin: pw.EdgeInsets.only(bottom: 20),
-                child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(sanitizeText('Rapport de Missions'), style: pw.TextStyle(font: fontBold, fontSize: 24)),
-                    pw.Text(sanitizeText(DateFormat('dd/MM/yyyy').format(DateTime.now())), style: pw.TextStyle(font: font, fontSize: 12)),
-                  ],
-                ),
+          return [
+            pw.Header(
+              level: 0,
+              margin: pw.EdgeInsets.only(bottom: 20),
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(sanitizeText('Rapport de Missions'), style: pw.TextStyle(font: fontBold, fontSize: 24)),
+                  pw.Text(sanitizeText(DateFormat('dd/MM/yyyy').format(DateTime.now())), style: pw.TextStyle(font: font, fontSize: 12)),
+                ],
               ),
+            ),
+            pw.Text(
+              sanitizeText(nom!),
+              style: pw.TextStyle(
+                font: fontBold,
+                fontSize: 18,
+                color: PdfColors.teal,
+              ),
+            ),
+            pw.SizedBox(height: 10),
+            pw.Text(
+              sanitizeText('Liste des Missions entre le $formattedStartDate et le $formattedEndDate'),
+              style: pw.TextStyle(
+                font: fontBold,
+                fontSize: 16,
+              ),
+            ),
+            pw.SizedBox(height: 10),
+            pw.Divider(),
+            pw.SizedBox(height: 10),
+            pw.Table.fromTextArray(
+              headers: [
+                'Date',
+                'Etablissement',
+                'Heure début',
+                'Heure fin',
+                'Durée'
+              ].map((header) => sanitizeText(header)).toList(),
+              data: _missions!.map((mission) {
+                return [
+                  sanitizeText(DateFormat('dd/MM/yyyy').format(mission.date)),
+                  sanitizeText(mission.etabli ?? 'Inconnu'),
+                  sanitizeText(mission.heureDebut ?? 'Inconnu'),
+                  sanitizeText(mission.heureFin ?? 'Inconnu'),
+                  sanitizeText(mission.duree?.substring(0, 5) ?? 'Inconnu'),
+                ];
+              }).toList(),
+              border: pw.TableBorder.all(color: PdfColors.grey, width: 0.5),
+              cellAlignment: pw.Alignment.centerLeft,
+              headerStyle: pw.TextStyle(
+                font: fontBold,
+                fontSize: 12,
+                color: PdfColors.white,
+              ),
+              headerDecoration: pw.BoxDecoration(color: PdfColors.blue),
+              cellStyle: pw.TextStyle(
+                font: font,
+                fontSize: 10,
+              ),
+              cellPadding: pw.EdgeInsets.all(4),
+              columnWidths: {
+                0: pw.FixedColumnWidth(80),
+                1: pw.FixedColumnWidth(100),
+                2: pw.FixedColumnWidth(60),
+                3: pw.FixedColumnWidth(70),
+                4: pw.FixedColumnWidth(70),
+              },
+              cellAlignments: {
+                0: pw.Alignment.center,
+                1: pw.Alignment.center,
+                2: pw.Alignment.center,
+                3: pw.Alignment.center,
+                4: pw.Alignment.center,
+              },
+            ),
+            pw.SizedBox(height: 16),
+            if (_totalHours != null && _totalHours!.isNotEmpty)
               pw.Text(
-                sanitizeText(nom!),
+                sanitizeText('Total des heures: ${formatTotalHours(_totalHours!)}'),
                 style: pw.TextStyle(
                   font: fontBold,
-                  fontSize: 18,
+                  fontSize: 14,
                   color: PdfColors.teal,
                 ),
               ),
-              pw.SizedBox(height: 10),
-              pw.Text(
-                sanitizeText('Liste des Missions entre le $formattedStartDate et le $formattedEndDate'),
-                style: pw.TextStyle(
-                  font: fontBold,
-                  fontSize: 16,
-                ),
-              ),
-              pw.SizedBox(height: 10),
-              pw.Divider(),
-              pw.SizedBox(height: 10),
-              pw.Table.fromTextArray(
-                headers: [
-                  'Date',
-                  'Etablissement',
-                  'Heure début',
-                  'Heure fin',
-                  'Durée'
-                ].map((header) => sanitizeText(header)).toList(),
-                data: _missions!.map((mission) {
-                  return [
-                    sanitizeText(DateFormat('dd/MM/yyyy').format(mission.date)),
-                    sanitizeText(mission.etabli ?? 'Inconnu'),
-                    sanitizeText(mission.heureDebut ?? 'Inconnu'),
-                    sanitizeText(mission.heureFin ?? 'Inconnu'),
-                    sanitizeText(mission.duree?.substring(0, 5) ?? 'Inconnu'),
-                  ];
-                }).toList(),
-                border: pw.TableBorder.all(color: PdfColors.grey, width: 0.5),
-                cellAlignment: pw.Alignment.centerLeft,
-                headerStyle: pw.TextStyle(
-                  font: fontBold,
-                  fontSize: 12,
-                  color: PdfColors.white,
-                ),
-                headerDecoration: pw.BoxDecoration(color: PdfColors.blue),
-                cellStyle: pw.TextStyle(
-                  font: font,
-                  fontSize: 10,
-                ),
-                cellPadding: pw.EdgeInsets.all(4),
-                columnWidths: {
-                  0: pw.FixedColumnWidth(80),
-                  1: pw.FixedColumnWidth(100),
-                  2: pw.FixedColumnWidth(60),
-                  3: pw.FixedColumnWidth(70),
-                  4: pw.FixedColumnWidth(70),
-                },
-                cellAlignments: {
-                  0: pw.Alignment.center,
-                  1: pw.Alignment.center,
-                  2: pw.Alignment.center,
-                  3: pw.Alignment.center,
-                  4: pw.Alignment.center,
-                },
-              ),
-              pw.SizedBox(height: 16),
-              if (_totalHours != null && _totalHours!.isNotEmpty)
-                pw.Text(
-                  sanitizeText('Total des heures: ${formatTotalHours(_totalHours!)}'),
-                  style: pw.TextStyle(
-                    font: fontBold,
-                    fontSize: 14,
-                    color: PdfColors.teal,
-                  ),
-                ),
-              pw.Spacer(),
-            ],
-          );
+          ];
         },
       ),
     );
