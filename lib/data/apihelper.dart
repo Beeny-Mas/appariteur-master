@@ -121,7 +121,7 @@ class AuthApi {
     return false;
   }
 
-  static Future<UserData?>  getLocalUserData() async {
+  static Future<UserData?> getLocalUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
     if (userId == null) return null; // Si l'utilisateur n'est pas connecté
@@ -141,9 +141,9 @@ class AuthApi {
       codepostal: prefs.getString('codepostal') ?? '',
       ville: prefs.getString('ville') ?? '',
       pays: prefs.getString('pays') ?? '',
-      niveau: prefs.getString('niveau') ?? '', 
+      niveau: prefs.getString('niveau') ?? '',
       user:prefs.getString('user') ?? '',
-      
+
     );
   }
   static Future<UserData?> getOnlineUserData() async {
@@ -262,39 +262,53 @@ class AuthApi {
       return null;
     }
     const url = 'https://appariteur.com/api/users/infos_g.php';
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
 
     try {
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      // Convertir la réponse en string
+      String responseBody = response.body;
+
+      // Nettoyer la réponse des caractères numériques au début
+      responseBody = responseBody.replaceFirst(RegExp(r'^\d+'), '');
+
+      // Vérifier si la chaîne commence maintenant par {
+      if (!responseBody.trim().startsWith('{')) {
+        print('Erreur: La réponse ne commence pas par { après nettoyage');
+        return null;
+      }
+
+      // Parser le JSON nettoyé
+      final Map<String, dynamic> responseData = jsonDecode(responseBody);
+
+      // Vérifier si la réponse est un succès
+      if (responseData['success'] != true) {
+        print('Erreur: La réponse indique un échec');
+        return null;
+      }
+
       final Map<String, dynamic> userData = responseData['data'];
 
-      final String? heureWeek = userData['heure_week'];
-      final String? heureMonth = userData['heure_month'];
-      final String? heureYear = userData['heure_year'];
-
-
-
-      final String effeMis = userData['effe_mis'];
-
+      // Créer l'objet UserInfo avec les données
       final UserInfo userInfo = UserInfo(
-        heureWeek: heureWeek,
-        heureMonth: heureMonth,
-        heureYear: heureYear,
-        effeMis: effeMis,
-
+        heureWeek: userData['heure_week'],
+        heureMonth: userData['heure_month'],
+        heureYear: userData['heure_year'],
+        effeMis: userData['effe_mis'],
       );
-      print(userInfo);
+
+      print('Données utilisateur récupérées avec succès: $userInfo');
       return userInfo;
-      // Retourne les informations utilisateur
+
     } catch (e) {
-      print('Erreur de décodage JSON : $e');
-      return null; // Retourne null en cas d'erreur de décodage JSON
+      print('Erreur lors du traitement des données: $e');
+      return null;
     }
   }
 
@@ -546,55 +560,55 @@ class AuthApi {
 
 
   static Future<bool> updatePlanning(Planning planning, String salle, String heureDebut, String heureFin) async {
-  final token = await getToken();
-  if (token == null) {
-  print('Token is null');
-  return false;
-  }
+    final token = await getToken();
+    if (token == null) {
+      print('Token is null');
+      return false;
+    }
 
-  const url = 'https://appariteur.com/api/users/planning.php';
-  Map<String, dynamic> requestBody = {
+    const url = 'https://appariteur.com/api/users/planning.php';
+    Map<String, dynamic> requestBody = {
 
-  'updates':
-  {
-  'name_etabli': planning.nameEtabli,
-  'salle': salle,
-  'date_pres': planning.datePres,
-  'heure_debut': heureDebut,
-  'heure_fin': heureFin
-  }
+      'updates':
+      {
+        'name_etabli': planning.nameEtabli,
+        'salle': salle,
+        'date_pres': planning.datePres,
+        'heure_debut': heureDebut,
+        'heure_fin': heureFin
+      }
 
 
-  };
+    };
 
-  String jsonBody = jsonEncode(requestBody);
-  print('Sending update object: $jsonBody');
+    String jsonBody = jsonEncode(requestBody);
+    print('Sending update object: $jsonBody');
 
-  try {
-  final response = await http.post(
-  Uri.parse(url),
-  headers: {
-  'Content-Type': 'application/json',
-  'Authorization': 'Bearer $token',
-  },
-  body: jsonBody,
-  );
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonBody,
+      );
 
-  print('Response status: ${response.statusCode}');
-  print('Response body: ${response.body}');
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
-  if (response.statusCode == 200) {
-  var responseData = jsonDecode(response.body);
-  print('Response data: $responseData');
-  return responseData['success'];
-  } else {
-  print('Failed to update planning: ${response.body}');
-  return false;
-  }
-  } catch (e) {
-  print('Error updating planning: $e');
-  return false;
-  }
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        print('Response data: $responseData');
+        return responseData['success'];
+      } else {
+        print('Failed to update planning: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error updating planning: $e');
+      return false;
+    }
   }
 
 
@@ -655,39 +669,39 @@ class AuthApi {
     return null; // Gérer les erreurs comme vous le souhaitez
   }
 
-    static Future<void> sendDisponibilites(List<Map<String, dynamic>> disponibilites) async {
-      try {
-        final token = await getToken();
-        if (token == null) {
-          print('Error: Token is null');
-          return null;
-        }
-        const url = 'https://appariteur.com/api/users/disponibilites.php';
-        final Map<String, dynamic> requestBody = {'updates': disponibilites};
-        final response = await http.post(
-          Uri.parse(url),
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-          body: jsonEncode(requestBody),
-        );
-
-        // Traitement de la réponse
-        if (response.statusCode == 200) {
-          final responseData = jsonDecode(response.body);
-          if (responseData['success'] == true) {
-            print('Disponibilités ajoutées avec succès');
-          } else {
-            print('Erreur lors de l\'ajout des disponibilités');
-          }
-        } else {
-          print('Failed to add disponibilites. Status code: ${response.statusCode}');
-        }
-      } catch (e) {
-        print('Error sending disponibilites: $e');
+  static Future<void> sendDisponibilites(List<Map<String, dynamic>> disponibilites) async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        print('Error: Token is null');
+        return null;
       }
+      const url = 'https://appariteur.com/api/users/disponibilites.php';
+      final Map<String, dynamic> requestBody = {'updates': disponibilites};
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      // Traitement de la réponse
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          print('Disponibilités ajoutées avec succès');
+        } else {
+          print('Erreur lors de l\'ajout des disponibilités');
+        }
+      } else {
+        print('Failed to add disponibilites. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending disponibilites: $e');
     }
+  }
   static Future<bool> cancelMission(String missionId) async {
     final token = await getToken();
     if (token == null) {

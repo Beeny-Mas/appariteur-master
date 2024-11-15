@@ -19,7 +19,7 @@ class _CalendarPageState extends State<CalendarPage> {
   DateTime? _selectedDay;
   DateTime? _previouslySelectedDay;
   List<Planning>? _plannings;
-
+  bool _isProcessingCancelation = false;
 
   var heure_Year = "00:00";
   var heure_Month = "00:00";
@@ -31,9 +31,18 @@ class _CalendarPageState extends State<CalendarPage> {
     ShowUserInfo();
     _fetchPlannings();
   }
+
   void _closeAndRefresh() {
-    Navigator.of(context).pop(); // Fermer la fenêtre actuelle
-    _refreshPlannings(); // Actualiser la page
+    Navigator.of(context).pop();
+    _refreshPlannings();
+  }
+  void _refreshPlannings() async {
+    _fetchPlannings();
+  }
+
+  void _fetchPlannings() async {
+    _plannings = await AuthApi.getPlanningData();
+    setState(() {});
   }
 
   void _showEditForm(Planning planning) {
@@ -45,7 +54,46 @@ class _CalendarPageState extends State<CalendarPage> {
         String heureFin = planning.heureFin.substring(0,5);
 
         return AlertDialog(
-          title: Text('Modifier la mission'),
+          titlePadding: EdgeInsets.zero,
+          title: Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start, // Aligne à gauche
+                  children: [
+                    Text(
+                      "Modifier la mission",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2A4494),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.close_rounded,
+                    color: Colors.red[400], // Couleur plus douce
+                    size: 28, // Taille légèrement plus grande
+                  ),
+                  splashRadius: 24, // Ajoute un effet de splash plus petit
+                  onPressed: () => Navigator.of(context).pop(),
+                  padding: EdgeInsets.zero, // Réduit le padding par défaut
+                  constraints: BoxConstraints(), // Minimise les contraintes
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.all(
+                      Colors.red[100], // Couleur de l'effet hover plus douce
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -69,7 +117,7 @@ class _CalendarPageState extends State<CalendarPage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('OK'),
+              child: const Text('Annuler'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -77,8 +125,99 @@ class _CalendarPageState extends State<CalendarPage> {
             TextButton(
               child: Text('Soumettre'),
               onPressed: () {
-                AuthApi.updatePlanning(planning, salle, heureDebut, heureFin)
-                    .then((success) {
+                _confirmEditMission(planning, salle, heureDebut, heureFin);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCancelForm(Planning planning) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titlePadding: EdgeInsets.zero,
+          title:Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start, // Aligne à gauche
+                  children: [
+                    Text(
+                      "Annuler la mission",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2A4494),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.close_rounded,
+                    color: Colors.red[400],
+                    size: 28,
+                  ),
+                  splashRadius: 24,
+                  onPressed: () => Navigator.of(context).pop(),
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.all(
+                      Colors.red[100], // Couleur de l'effet hover plus douce
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Text('Êtes-vous sûr de vouloir annuler cette mission ?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Non'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Oui'),
+              onPressed: () {
+                _confirmCancelMission(planning);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _confirmEditMission(Planning planning, String salle, String heureDebut, String heureFin) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmer la modification'),
+          content: Text('Voulez-vous vraiment modifier cette mission ?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Non'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Oui'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                AuthApi.updatePlanning(planning, salle, heureDebut, heureFin).then((success) {
                   _handleUpdateResult(success);
                 });
               },
@@ -89,38 +228,45 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  void _cancelMission(String prestationId, int index) {
-    AuthApi.cancelMission(prestationId).then((success) {
-      _handleCancelResult(success);
-    });
-  }
-  void _refreshPlannings() async {
-    _fetchPlannings();
+  void _confirmCancelMission(Planning planning) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmer l\'annulation'),
+          content: Text('Voulez-vous vraiment annuler cette mission ?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Non'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Oui'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Close both dialogs
+                setState(() {
+                  _isProcessingCancelation = true;
+                });
+
+                AuthApi.cancelMission(planning.prestationId).then((success) {
+                  setState(() {
+                    _isProcessingCancelation = false;
+                  });
+                  _handleCancelResult(success);
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  void _fetchPlannings() async {
-    _plannings = await AuthApi.getPlanningData();
-    setState(() {});
-  }
-
-
-  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    if (_previouslySelectedDay != null &&
-        selectedDay.day == _previouslySelectedDay!.day &&
-        selectedDay.month == _previouslySelectedDay!.month &&
-        selectedDay.year == _previouslySelectedDay!.year) {
-      _showMissionDetails(selectedDay);
-    } else {
-      setState(() {
-        _selectedDay = selectedDay;
-        _focusedDay = focusedDay;
-      });
-    }
-    _previouslySelectedDay = selectedDay;
-  }
   Widget _buildEventMarker(DateTime date, List<dynamic> events) {
     if (events.isNotEmpty) {
-
       Planning event = events.first;
       Color dotColor = _getDotColor(event.eventColor);
 
@@ -149,6 +295,7 @@ class _CalendarPageState extends State<CalendarPage> {
     }
     return Container();
   }
+
   Color _getDotColor(String eventColor) {
     switch (eventColor) {
       case 'green':
@@ -167,25 +314,51 @@ class _CalendarPageState extends State<CalendarPage> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: Center(
-            child: Row(
-              children: [
-                SizedBox(width: 20),
-                Icon(Icons.assignment, color: Color(0xFF2A4494)),
-                SizedBox(width: 10),
-                Text(
-                  "Missions",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2A4494),
+          titlePadding: EdgeInsets.zero,
+          title:Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start, // Aligne à gauche
+                  children: [
+                    Icon(Icons.assignment, color: Color(0xFF2A4494)),
+                    SizedBox(width: 10),
+                    Text(
+                      "Missions",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2A4494),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.close_rounded,
+                    color: Colors.red[400], // Couleur plus douce
+                    size: 28, // Taille légèrement plus grande
+                  ),
+                  splashRadius: 24, // Ajoute un effet de splash plus petit
+                  onPressed: () => Navigator.of(context).pop(),
+                  padding: EdgeInsets.zero, // Réduit le padding par défaut
+                  constraints: BoxConstraints(), // Minimise les contraintes
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.all(
+                      Colors.red[100], // Couleur de l'effet hover plus douce
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+
           content: Container(
-            width: double.maxFinite, // To take full width of the dialog
+            width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: plannings.length,
@@ -239,8 +412,6 @@ class _CalendarPageState extends State<CalendarPage> {
                           ],
                         ),
                         SizedBox(height: 8),
-
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -250,43 +421,18 @@ class _CalendarPageState extends State<CalendarPage> {
                                 _showEditForm(plannings[index]);
                               },
                             ),
-                            if (plannings[index].btnCancel) // Si btnCancel est true
+                            if (plannings[index].btnCancel && !_isProcessingCancelation)
                               ElevatedButton(
                                 child: Text('Annuler'),
                                 onPressed: () {
-                                  _cancelMission(plannings[index].prestationId, index);
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (BuildContext context) {
-                                      return Dialog(
-                                        child: Container(
-                                          padding: EdgeInsets.all(16.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              CircularProgressIndicator(),
-                                              SizedBox(width: 24),
-                                              Text("Mission annulée avec succès."),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                  Future.delayed(Duration(seconds: 1), () {
-                                    Navigator.pop(context); // Dismiss the dialog after 2 seconds
-                                  });
-                                  setState(() {
-                                    _plannings?.removeAt(index);
-                                  });
-
+                                  _showCancelForm(plannings[index]);
                                 },
                               ),
+                            if (_isProcessingCancelation)
+                              CircularProgressIndicator(),
                           ],
                         ),
-
-                    ],
+                      ],
                     ),
                   ),
                 );
@@ -305,9 +451,8 @@ class _CalendarPageState extends State<CalendarPage> {
       },
     );
   }
+
   void _handleCancelResult(bool success) {
-
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -328,8 +473,8 @@ class _CalendarPageState extends State<CalendarPage> {
       },
     );
   }
-  void _handleUpdateResult(bool success) {
 
+  void _handleUpdateResult(bool success) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -360,42 +505,8 @@ class _CalendarPageState extends State<CalendarPage> {
         heure_Week = userInfo.heureWeek ?? '00:00';
       });
     }
-    // Handle failed connection or response
   }
-  static Future<bool> cancelMission(String prestationId) async {
-    final token = await AuthApi.getToken();
-    if (token == null) {
-      print('Error: Token is null');
-      return false;
-    }
-    try {
-      final url = 'https://appariteur.com/api/users/planning.php?mission_id=$prestationId';
-      final response = await http.delete(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
 
-      if (response.statusCode == 200) {
-        var responseData = jsonDecode(response.body);
-        if (responseData['success'] == true) {
-          print('Mission annulée avec succès');
-          return true;
-        } else {
-          print('Erreur lors de l\'annulation de la mission : ${responseData['message']}');
-          return false;
-        }
-      } else {
-        print('Erreur HTTP lors de l\'annulation de la mission. Code: ${response.statusCode}');
-        return false;
-      }
-    } catch (e) {
-      print('Erreur lors de la connexion à l\'API pour annuler la mission : $e');
-      return false;
-    }
-  }
   @override
   Widget build(BuildContext context) {
     double _w = MediaQuery.of(context).size.width;
@@ -407,7 +518,7 @@ class _CalendarPageState extends State<CalendarPage> {
           GlobalWidgetsLocalizations.delegate,
         ],
         supportedLocales: [
-          const Locale('fr', 'FR'), // French
+          const Locale('fr', 'FR'),
         ],
         debugShowCheckedModeBanner: false,
         home: Scaffold(
@@ -433,74 +544,86 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
               SizedBox(height: _h * 0.03),
               Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(_w / 20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      _refreshPlannings();
+                    },
+                    child: TableCalendar(
+                      availableCalendarFormats: const {
+                        CalendarFormat.month: 'Month',
+                      },
+                      locale: 'fr_FR',
+                      focusedDay: _focusedDay,
+                      firstDay: DateTime(2000),
+                      lastDay: DateTime(2100),
+                      calendarFormat: _calendarFormat,
+                      eventLoader: _getPlanningsForDay,
+                      onDaySelected: _onDaySelected,
+                      onDayLongPressed: (selectedDay, focusedDay) {
+                        _showMissionDetails(selectedDay);
+                      },
+                      calendarBuilders: CalendarBuilders(
+                        markerBuilder: (context, date, events) {
+                          return _buildEventMarker(date, events);
+                        },
+                      ),
+                    ),
+                  )
+              ),
+              SizedBox(height: _h * 0.03),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(_w / 20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(_w / 20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
                 ),
-                child: RefreshIndicator(
-          onRefresh:() async{
-            _refreshPlannings();
-            },
-    child: TableCalendar(
-              availableCalendarFormats: const {
-                CalendarFormat.month: 'Month', // Only allow the month view
-              },
-              locale: 'fr_FR',
-              focusedDay: _focusedDay,
-              firstDay: DateTime(2000),
-              lastDay: DateTime(2050),
-              calendarFormat: _calendarFormat,
-              eventLoader: _getPlanningsForDay,
-              onDaySelected: _onDaySelected,
-              onDayLongPressed: (selectedDay, focusedDay) {
-                _showMissionDetails(selectedDay);
-              },
-                  calendarBuilders: CalendarBuilders(
-                    markerBuilder: (context, date, events) {
-                      return _buildEventMarker(date, events);
-                    },
+                child: Text(
+                  "Nombres d'heures de prestation",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: _w / 24,
                   ),
-            ),
-                )
-          ),
-              SizedBox(height: _h * 0.03),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(_w / 20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(_w / 20),
-            ),
-            child: Text(
-              "Nombres d'heures de prestation",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize:  _w / 24,
+                ),
               ),
-            ),
-          ),
-
               SizedBox(height: _h * 0.03),
-          _buildHourContainer("Cette semaine", heure_Week, _w, _h),
-          const SizedBox(height: 20.0),
-          _buildHourContainer("Ce mois", heure_Month,  _w, _h),
-          const SizedBox(height: 20.0),
-          _buildHourContainer("Cette année", heure_Year,  _w, _h),
-          const SizedBox(height: 30.0),
-        ],
-      ),
-    ));
+              _buildHourContainer("Cette semaine", heure_Week, _w, _h),
+              const SizedBox(height: 20.0),
+              _buildHourContainer("Ce mois", heure_Month, _w, _h),
+              const SizedBox(height: 20.0),
+              _buildHourContainer("Cette année", heure_Year, _w, _h),
+              const SizedBox(height: 30.0),
+            ],
+          ),
+        ));
   }
-
+  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    if (_previouslySelectedDay != null &&
+        selectedDay.day == _previouslySelectedDay!.day &&
+        selectedDay.month == _previouslySelectedDay!.month &&
+        selectedDay.year == _previouslySelectedDay!.year) {
+      _showMissionDetails(selectedDay);
+    } else {
+      setState(() {
+        _selectedDay = selectedDay;
+        _focusedDay = focusedDay;
+      });
+    }
+    _previouslySelectedDay = selectedDay;
+  }
   Widget _buildHourContainer(String title, String hours, double _w, double _h) {
     return Container(
       width: double.infinity,
