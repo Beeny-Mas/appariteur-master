@@ -1,3 +1,4 @@
+import 'package:appariteur/services/version_check.dart';
 import 'package:appariteur/views/splash/spash_screen.dart';
 import 'package:appariteur/views/widgets/addonglobal/bottombar.dart';
 import 'package:flutter/material.dart';
@@ -48,5 +49,28 @@ class MyApp extends StatelessWidget {
       title: 'Appariteur',
       home: initialScreen,
     );
+  }
+}
+class VersionCheckWrapper extends StatefulWidget {
+  final Widget child;
+
+  const VersionCheckWrapper({Key? key, required this.child}) : super(key: key);
+
+  @override
+  _VersionCheckWrapperState createState() => _VersionCheckWrapperState();
+}
+
+class _VersionCheckWrapperState extends State<VersionCheckWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      VersionCheck.checkVersion(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }

@@ -60,15 +60,15 @@ class Mission {
 
   factory Mission.fromJson(Map<String, dynamic> json) {
     return Mission(
-      date: DateTime.parse(json['date']),
-      etabli: json['etabli'],
-      duree: json['duree'],
-      moment: json['moment'],
-      numCmd: json['num_cmd'],
-      dureeEffective: json['duree_effective'],
-      heureDebut: json['heure_debut'],
-      heureFin: json['heure_fin'],
-      lieu:json['lieu']
+        date: DateTime.parse(json['date']),
+        etabli: json['etabli'],
+        duree: json['duree'],
+        moment: json['moment'],
+        numCmd: json['num_cmd'],
+        dureeEffective: json['duree_effective'],
+        heureDebut: json['heure_debut'],
+        heureFin: json['heure_fin'],
+        lieu:json['lieu']
     );
   }
 }

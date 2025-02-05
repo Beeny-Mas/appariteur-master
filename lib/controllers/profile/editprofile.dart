@@ -202,7 +202,7 @@ class _ProfilePageEditState extends State<ProfilePageEdit> {
               TextField(controller: _codepostalController, decoration: const InputDecoration(labelText: "Code Postal"), keyboardType: TextInputType.number),
               TextField(controller: _paysController, decoration: const InputDecoration(labelText: "Pays")),
               const SizedBox(height: 20),
-              ElevatedButton(onPressed: _updateProfile, child: const Text('Enregistrer', style: TextStyle(color: Colors.blue))),
+              ElevatedButton(onPressed: _updateProfile, child: const Text('Enregistrer')),
             ],
           ),
         ),

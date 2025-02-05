@@ -190,7 +190,7 @@ class _ProfilePageState extends State<ProfilePage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         Future.delayed(Duration(seconds: 3), () {
-          Navigator.of(context).pop(true); // Ferme le dialogue après 2 secondes
+          Navigator.of(context).pop(true);
           Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => SignInScreen()),
                 (Route<dynamic> route) => false,

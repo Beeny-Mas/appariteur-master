@@ -1,9 +1,7 @@
 import 'dart:convert';
 
-import 'package:appariteur/util/dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import '../../models/user.dart';
 import '../../views/notif/notifScreen.dart';
@@ -40,22 +38,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
   FocusNode countryFocusNode = FocusNode();
   bool isLoading = false;
 
-  String selectedGender = "";
+  String selectedGender = "Masculin";
 
   Future<void> signUpUser() async {
     setState(() {
       isLoading = true;
     });
-
-    // Vérification des champs obligatoires
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
-        confirmPasswordController.text.isEmpty) {
+        confirmPasswordController.text.isEmpty ||
+        phoneController.text.isEmpty ||
+        birthdateController.text.isEmpty ||
+        birthplaceController.text.isEmpty ||
+        streetController.text.isEmpty ||
+        cityController.text.isEmpty ||
+        countryController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Veuillez remplir tous les champs obligatoires'),
-          duration: Duration(seconds: 3),
+          content: Text('Veuillez remplir tous les champs'),
+          duration: Duration(seconds:  3),
         ),
       );
       setState(() {
@@ -64,21 +66,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-    // Validation du numéro de téléphone
-    String phone = phoneController.text;
-
-    // Si le numéro commence par "0", on le transforme en "+33"
-    if (phone.startsWith('0')) {
-      phone = '+33${phone.substring(1)}';
-    }
-
+    // Vérification du format du numéro de téléphone
     final phonePattern = RegExp(r'^\+33[0-9]{9}$');
-
-    if (!phonePattern.hasMatch(phone)) {
+    if (!phonePattern.hasMatch(phoneController.text)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Numéro de téléphone invalide'),
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds:  3),
         ),
       );
       setState(() {
@@ -92,7 +86,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Les mots de passe ne correspondent pas'),
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds:  3),
         ),
       );
       setState(() {
@@ -107,7 +101,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Adresse e-mail invalide'),
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds:  3),
         ),
       );
       setState(() {
@@ -116,22 +110,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-    // Assignation de valeurs par défaut pour les champs non obligatoires
-    String gender = selectedGender.isNotEmpty ? selectedGender : "";
-    String birthdate = birthdateController.text.isNotEmpty ? birthdateController.text : "";
-    String fullAddress = streetController.text.isNotEmpty ? "${streetController.text}, ${cityController.text}, ${countryController.text}" : "";
-    var userData = UserData(
-      name: nameController.text,
-      email: emailController.text,
-      tel: phoneController.text,
-      sexe: gender,
-      password: passwordController.text,
-      datenais: birthdate,
-      lieunais: birthplaceController.text,
-      rue: fullAddress,
-      pays: countryController.text.isNotEmpty ? countryController.text : "",
-    ).toApiJson();
-    print("Données envoyées : ${jsonEncode(userData)}");
     try {
       final response = await http.post(
         Uri.parse('https://appariteur.com/api/users/register.php'),
@@ -141,19 +119,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
         body: jsonEncode(UserData(
           name: nameController.text,
           email: emailController.text,
-          tel: phone,  // Utilisation du numéro de téléphone modifié
-          sexe: gender,
+          tel: phoneController.text,
+          sexe: selectedGender,
           password: passwordController.text,
-          datenais: birthdate,
+          datenais: birthdateController.text,
           lieunais: birthplaceController.text,
-          rue: fullAddress,
-          pays: countryController.text.isNotEmpty ? countryController.text : "",
+          rue: streetController.text,
+          pays: countryController.text,
         ).toApiJson()),
-
       );
 
-      if (response.statusCode == 201) {
-        // Succès de l'inscription
+      if (response.statusCode ==  201) {
         print("Succès");
         showDialog(
           context: context,
@@ -182,6 +158,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           },
         );
       } else {
+        // Gérer les erreurs de l'API
         print('Erreur lors de l\'inscription: ${response.body}');
       }
     } catch (e, stackTrace) {
@@ -193,13 +170,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       });
     }
   }
-
-
   @override
   void initState() {
     super.initState();
     countryFocusNode.unfocus();
-    phoneController.text = "";
+    phoneController.text = "+33";
     phoneController.addListener(() {
       if (phoneController.text.length > 12) {
         phoneController.text = phoneController.text.substring(0, 12);
@@ -227,13 +202,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             children: <Widget>[
               SizedBox(height: 100),
-              Text(
-                "S'inscrire",
-                style: GoogleFonts.montserrat(
-                  textStyle: boldTextStyle(size: 24, color: Colors.white),
-                ),
-              ),
-              SizedBox(height: 25),
+              Text("S'inscrire", style: boldTextStyle(size: 24, color: black)),
               SingleChildScrollView(
                 child: Container(
                   width: 1200, // Largeur fixe pour le contenu scrollable
@@ -252,9 +221,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                SizedBox(height: 60),
-                                Row(children: [Text("*", style: TextStyle(color: Colors.red),),Text(" Indique un champ obligatoire")],),
-                                SizedBox(height: 15),
+                                SizedBox(height: 80),
                                 AppTextField(
                                   decoration: coInputDecoration(
                                     hint: 'Entrer vos noms et prénoms',
@@ -269,8 +236,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   focus: nameFocusNode,
                                   nextFocus: emailFocusNode,
                                   cursorColor: Colors.blue,
-                                  suffix: Text("*", style: TextStyle(color: Colors.red, fontWeight:FontWeight.bold ),)
-
 
                                 ),
                                 16.height,
@@ -285,9 +250,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   textFieldType: TextFieldType.EMAIL,
                                   keyboardType: TextInputType.text,
                                   controller: emailController,
-                                  focus: emailFocusNode, suffix: Text("*", style: TextStyle(color: Colors.red, fontWeight:FontWeight.bold ),),
+                                  focus: emailFocusNode,
                                   nextFocus: phoneFocusNode,
-
                                 ),
                                 16.height,
                                 AppTextField(
@@ -357,7 +321,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   focus: passwordFocusNode,
                                   nextFocus: birthdateFocusNode,
                                   cursorColor: Colors.blue,
-                                    suffix: Text("*", style: TextStyle(color: Colors.red, fontWeight:FontWeight.bold ),)
                                 ),
                                 16.height,
                                 AppTextField(
@@ -373,7 +336,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   focus: confirmPasswordFocusNode,
                                   nextFocus: passwordFocusNode,
                                   cursorColor: Colors.blue,
-                                    suffix: Text("*", style: TextStyle(color: Colors.red, fontWeight:FontWeight.bold ),)
                                 ),
                                 16.height,
                                 GestureDetector(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../data/apihelper.dart';
@@ -97,13 +96,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         child: Column(
           children: <Widget>[
             SizedBox(height:  100),
-            Text(
-              "Réinitialiser le mot de passe",
-              style: GoogleFonts.montserrat(
-                textStyle: boldTextStyle(size: 24, color: Colors.white),
-              ),
-            ),
-            SizedBox(height: 25),
+            Text("Réinitialiser le mot de passe", style: boldTextStyle(size:  24, color: black)),
             SingleChildScrollView(
               child: Container(
                 width:  400, // Largeur fixe pour le contenu scrollable
@@ -139,7 +132,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   ? Center(child: CircularProgressIndicator())
                                   : AppButton(
                                 text: "Réinitialiser le mot de passe",
-                                color: Colors.blue,
+                                color: Theme.of(context).primaryColor,
                                 textColor: Colors.white,
                                 shapeBorder: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),

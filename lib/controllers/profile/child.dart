@@ -23,7 +23,7 @@ class ProfileChild extends StatelessWidget {
             alignment: Alignment.center,
             child: const ProfileImg(),
           ),
-           SizedBox(height: _w /20),
+          SizedBox(height: _w /20),
           FirsContentPro(
             text: "Mon Compte",
             icon: "assets/icons/User Icon.svg",
@@ -31,7 +31,7 @@ class ProfileChild extends StatelessWidget {
               Navigator.push(context, SlideTransition1(const ProfilePage())),
             },
           ),
-        /*  FirsContentPro(
+          /*  FirsContentPro(
             text: "Notifications",
             icon: "assets/icons/Bell.svg",
             press: () => {
@@ -71,7 +71,7 @@ class ProfileChild extends StatelessWidget {
               ),
             },
           ),
-         /* FirsContentPro(
+          /* FirsContentPro(
             text: "Paramètres",
             icon: "assets/icons/Settings.svg",
             press: () => {

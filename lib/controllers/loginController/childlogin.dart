@@ -89,16 +89,10 @@ class _SignInScreenState extends State<SignInScreen> {
         child: Column(
           children: <Widget>[
             SizedBox(height: 100),
-          Text(
-            "Se connecter",
-            style: GoogleFonts.montserrat(
-              textStyle: boldTextStyle(size: 26, color: Colors.white),
-            ),
-          ),
-          SizedBox(height: 25),
+            Text("Se connecter", style: boldTextStyle(size: 24, color: black)),
             SingleChildScrollView(
               child: Container(
-                width: 400,
+                width: 400, // Largeur fixe pour le contenu scrollable
                 child: Column(
                   children: <Widget>[
                     Stack(
@@ -114,7 +108,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              SizedBox(height: 80),
+                              SizedBox(height: 80), // Pour l'espacement sous le logo
                               AppTextField(
                                 decoration: coInputDecoration(
                                     hint: 'Entrer votre email',
@@ -148,7 +142,8 @@ class _SignInScreenState extends State<SignInScreen> {
                               5.height,
                               Align(
                                 alignment: Alignment.centerRight,
-                                child: TextButton(
+                                child:
+                                TextButton(
                                   onPressed: () {
                                     Navigator.push(
                                       context,
@@ -183,30 +178,30 @@ class _SignInScreenState extends State<SignInScreen> {
                                 right: _w * 0.1,
                               ),
                               30.height,
-                              Center(
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      'Vous n\'avez pas de compte?',
-                                      style: primaryTextStyle(color: Colors.grey),
-                                    ),
-                                    8.height,
-                                    Text(
-                                        'Inscrivez-vous ici',
-                                        style: GoogleFonts.montserrat(
-                                          textStyle: boldTextStyle(color: Colors.blue.shade600),
-                                        ),
-                                    ).onTap(() {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => SignUpScreen(),
-                                        ),
-                                      );
-                                    }),
-                                  ],
-                                ),
-                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('Vous n\'avez pas de compte?',
+                                      style: primaryTextStyle(
+                                          color: Colors.grey)),
+                                  3.width,
+                                  Flexible(
+                                    child: Text('Inscrivez-vous ici',
+                                        textAlign: TextAlign.center,
+                                        style: boldTextStyle(color: black)),
+                                  ),
+                                ],
+                              ).onTap(() {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SignUpScreen()
+                                  ),
+                                );
+                              }).center(),
                               20.height,
                             ],
                           ),
@@ -229,24 +224,23 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
               ),
             ),
-            Spacer(),
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: EdgeInsets.only(bottom: 16),
+                padding: EdgeInsets.only(bottom: 16), // Réduit le padding bottom
                 child: TextButton(
                   onPressed: _launchURL,
                   child: Text(
-                    "En savoir plus",
-                    style: GoogleFonts.montserrat(
-                      textStyle: boldTextStyle(
-                        color: Colors.white,
-                      ),
+                    "Découvrir Appariteur",
+                    style: GoogleFonts.merienda(
+                      fontSize: _w * 0.05,
+                      color: Colors.white,
+                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
