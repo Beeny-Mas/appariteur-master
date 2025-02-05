@@ -10,7 +10,7 @@ workflows:
       vars:
         XCODE_WORKSPACE: "Runner.xcworkspace"  # Remplacez par le nom de votre workspace si différent
         XCODE_SCHEME: "Runner"  # Remplacez par le nom de votre scheme si différent
-        BUNDLE_ID: "com.h24consult.appariteur"  # Remplacez par votre Bundle ID
+        BUNDLE_ID: "com.h24consulting.appariteur"  # Remplacez par votre Bundle ID
 
     scripts:
       - name: Get Flutter packages
@@ -19,7 +19,7 @@ workflows:
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
-      - name: Flutter run
+      - name: Flutter build
         script: |
-          flutter build ipa --export-options-plist=/Users/builder/export_options.plist
+          flutter build ipa --export-options-plist=ios/exportOptions.plist
 
