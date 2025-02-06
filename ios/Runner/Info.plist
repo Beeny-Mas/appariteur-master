@@ -22,6 +22,7 @@
     <string>????</string>
     <key>CFBundleVersion</key>
     <string>8</string>
+
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>UILaunchStoryboardName</key>
@@ -50,6 +51,11 @@
         <string>fetch</string>
         <string>processing</string>
         <string>remote-notification</string>
+    </array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.h24consulting.appariteur.refresh</string>
+        <string>com.h24consulting.appariteur.processing</string>
     </array>
     <key>NSDocumentsFolderUsageDescription</key>
     <string>Cette application nécessite l'accès au dossier Documents pour enregistrer des fichiers PDF téléchargés.</string>
