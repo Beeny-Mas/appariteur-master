@@ -19,7 +19,6 @@ workflows:
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
-      - name: Flutter build
+      - name: Flutter run
         script: |
-          flutter build ipa --export-options-plist=ios/exportOptions.plist
-
+          flutter build ipa --export-options-plist=/Users/builder/export_options.plist
