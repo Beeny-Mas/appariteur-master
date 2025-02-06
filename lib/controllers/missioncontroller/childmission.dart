@@ -203,8 +203,8 @@ class _BodyMState extends State<BodyM> {
     final user = await AuthApi.getLocalUserData();
     String? _nom= '';
     if (user != null) {
-      _nom=user.name;
-      return _nom;
+_nom=user.name;
+return _nom;
     }
   }
 

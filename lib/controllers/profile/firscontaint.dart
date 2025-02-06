@@ -21,7 +21,7 @@ class FirsContentPro extends StatelessWidget {
           foregroundColor: Colors.black,
           padding: const EdgeInsets.all(20),
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           backgroundColor: const Color(0xFFF5F6F9),
         ),
         onPressed: press,
