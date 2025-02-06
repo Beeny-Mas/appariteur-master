@@ -126,14 +126,35 @@ class ListItem extends StatelessWidget {
         );
       } else if (Platform.isIOS) {
         Dio dio = Dio();
+
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: Row(
+                children: [
+                  CircularProgressIndicator(color: Colors.blue,),
+                  SizedBox(width: 20),
+                  Expanded(child: Text("Téléchargement en cours...")),
+                ],
+              ),
+            );
+          },
+        );
+
         await dio.download(url, savePath, onReceiveProgress: (received, total) {
           if (received == total) {
             print("File downloaded to: $savePath");
+
+            Navigator.pop(context);
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 showCloseIcon: true,
-                duration: Duration(seconds: 8),
-                content: Text('Fichier "$fileName" téléchargé avec succès dans : $savePath.'),
+                duration: Duration(seconds: 10),
+                content: Text('Fichier "$fileName" téléchargé avec succès.'),
                 action: SnackBarAction(
                   label: 'Ouvrir',
                   onPressed: () {
@@ -143,11 +164,16 @@ class ListItem extends StatelessWidget {
                 ),
               ),
             );
-            _showDownloadNotification(fileName, savePath);
+
           }
         });
       }
     } catch (e) {
+      // Fermer l'indicateur de téléchargement en cas d'erreur
+      if (Platform.isIOS) {
+        Navigator.pop(context);
+      }
+
       print("Error during file download: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -157,26 +183,6 @@ class ListItem extends StatelessWidget {
     }
   }
 
-  Future<void> _showDownloadNotification(
-      String fileName, String filePath) async {
-    const DarwinNotificationDetails iosPlatformChannelSpecifics =
-    DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-    NotificationDetails(iOS: iosPlatformChannelSpecifics);
-
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      'Téléchargement terminé',
-      'Fichier "$fileName" téléchargé avec succès. Ouvrir ?',
-      platformChannelSpecifics,
-      payload: filePath,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

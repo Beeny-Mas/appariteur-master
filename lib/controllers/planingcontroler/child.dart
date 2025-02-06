@@ -140,12 +140,12 @@ class _CalendarPageState extends State<CalendarPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           titlePadding: EdgeInsets.zero,
-          title: Stack(
+          title:Stack(
             children: [
               Container(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start, // Aligne à gauche
                   children: [
                     Text(
                       "Annuler la mission",
@@ -166,7 +166,15 @@ class _CalendarPageState extends State<CalendarPage> {
                     color: Colors.red[400],
                     size: 28,
                   ),
+                  splashRadius: 24,
                   onPressed: () => Navigator.of(context).pop(),
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.all(
+                      Colors.red[100], // Couleur de l'effet hover plus douce
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -182,7 +190,6 @@ class _CalendarPageState extends State<CalendarPage> {
             TextButton(
               child: Text('Oui'),
               onPressed: () {
-                Navigator.of(context).pop();
                 _confirmCancelMission(planning);
               },
             ),
@@ -226,37 +233,20 @@ class _CalendarPageState extends State<CalendarPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Dernière confirmation'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.red, size: 50),
-              SizedBox(height: 20),
-              Text(
-                "Êtes-vous absolument sûr de vouloir annuler cette mission ?",
-                style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 10),
-              Text(
-                "Cette action est irréversible !",
-                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+          title: Text('Confirmer l\'annulation'),
+          content: Text('Voulez-vous vraiment annuler cette mission ?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Non, annuler', style: TextStyle(color: Colors.grey)),
+              child: const Text('Non'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Oui, je suis sûr', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              child: Text('Oui'),
               onPressed: () {
-                Navigator.of(context).pop(); // Ferme le dialogue de confirmation
-                Navigator.of(context).pop(); // Ferme le dialogue initial
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Close both dialogs
                 setState(() {
                   _isProcessingCancelation = true;
                 });
