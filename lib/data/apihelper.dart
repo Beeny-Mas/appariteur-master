@@ -26,6 +26,11 @@ class AuthApi {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
   }
+
+  static Future<bool> isUserAdmin() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isAdmin') ?? false;
+  }
   static Future<UserData?> login(String email, String password) async {
     try {
       const url = 'https://appariteur.com/api/users/login.php';

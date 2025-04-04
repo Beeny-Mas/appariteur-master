@@ -1,3 +1,4 @@
+import 'package:appariteur/views/carte/cartevue.dart';
 import 'package:appariteur/views/mission/missionvue.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ class MyBottomNav extends StatefulWidget {
 
 class MyBottomNavState extends State<MyBottomNav> {
   int _currentIndex =
-      0; // Défini sur 0 pour afficher la page d'accueil par défaut.
+  0; // Défini sur 0 pour afficher la page d'accueil par défaut.
   Color? _backgroundColor;
   @override
   void initState() {
@@ -31,11 +32,14 @@ class MyBottomNavState extends State<MyBottomNav> {
       Icon(Icons.calendar_month, size: 30, color: Colors.blueGrey),
       Icon(Icons.add_business, size: 30, color: Colors.blueGrey),
       Icon(Icons.table_rows_sharp, size: 30, color: Colors.blueGrey),
+      Icon(Icons.credit_card, size: 30, color: Colors.blueGrey),
+
+
       Icon(Icons.person, size: 30, color: Colors.blueGrey)
     ];
     return Scaffold(
       backgroundColor:
-          _backgroundColor, // Utiliser la couleur de fond dynamique
+      _backgroundColor, // Utiliser la couleur de fond dynamique
       body: getSelectedWidget(index: _currentIndex),
       bottomNavigationBar: CurvedNavigationBar(
         color: Colors.white60,
@@ -81,8 +85,10 @@ class MyBottomNavState extends State<MyBottomNav> {
         return DispoScreen();
       case 2:
         return const MissionScreen();
+      case 3:
+        return const CarteVue();
 
-      case 3 :
+      case 4 :
         return const ProfileVue();
       default:
         return PlanningScreen();
