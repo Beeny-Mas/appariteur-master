@@ -254,9 +254,9 @@ class _CarteControllerState extends State<CarteController> {
                                   ),
                                 ),
                                 SizedBox(height: 6.0),
-                                _buildInfoRow('NOM :', userData?.name?.split(' ').last ?? 'N/A'),
+                                _buildInfoRow('NOM :', userData?.name?.split(' ').first ?? 'N/A'),
                                 SizedBox(height: 2.0),
-                                _buildInfoRow('PRÉNOM :', userData?.name?.split(' ').first ?? 'N/A'),
+                                _buildInfoRow('PRÉNOM(S) :', userData?.name?.split(' ').last ?? 'N/A'),
                                 SizedBox(height: 2.0),
                                 // Vérifier si appariteurId existe et n'est pas vide
                                 _buildInfoRow('ID APPARITEUR :', userData?.appariteurId != null && userData!.appariteurId!.isNotEmpty ? userData!.appariteurId! : 'N/A'),
